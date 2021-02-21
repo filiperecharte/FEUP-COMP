@@ -8,7 +8,7 @@ PARSER_BEGIN(Calculator)
 public class Calculator {
     public static void main(String[] args) throws ParseException {
         System.out.println("Parser for a calculator that accepts expressions with integers, +,-,*,/,(, and ).");
-        System.out.println("Write anarithmetic expression");
+        System.out.println("Write an arithmetic expression");
         Calculator myCalc = new Calculator(System.in);
         SimpleNode root = myCalc.Expression();
 
