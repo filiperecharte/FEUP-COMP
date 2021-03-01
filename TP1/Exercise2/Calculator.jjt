@@ -54,10 +54,11 @@ SKIP :
 TOKEN : 
 {
     < INTEGER : (["0" - "9"])+ >
-    | < LF : ("\r")*"\n">
+    | < MINUS: "-" >
     | < SYMBOL: ["A"-"Z", "a"-"z"](["0"-"9", "A"-"Z", "a"-"z"])* >
     | < SEMICOL: ";" >
     | < EQUALS: "=" >
+    | < LF : ("\r")*"\n">
     | < END: <SEMICOL> <LF> >
 }
 
@@ -69,17 +70,20 @@ SimpleNode Expression(): {}
 void Assignment() #void: { Token t1, t2; }
 {
       t1 = <SYMBOL> <EQUALS>
-      t2 = <INTEGER> <END>
-      { variables.put(t1.image, Integer.parseInt(t2.image)); }
-      [ Assignment() | Expr1() ]
+      [
+          t2 = <INTEGER> {variables.put(t1.image, Integer.parseInt(t2.image));}
+          | <MINUS> t2 = <INTEGER> {variables.put(t1.image, -Integer.parseInt(t2.image));}
+      ]
+      <END>
+      [ Assignment() | Expr1(1) ]
 }
 
-void Expr1() #void: {}
+void Expr1(int sign) #void: {}
 {
-    Expr2(1) 
+    Expr2(sign)
     [
-        ( "+" Expr2(1) #Add(2)
-        | "-" Expr2(1) #Sub(2))
+        ( "+" Expr2(sign) #Add(2)
+        | "-" Expr2(sign) #Sub(2))
     ]
 }
 
@@ -101,5 +105,5 @@ void Expr3(int sign) #void: {Token t;}
         jjtThis.val = sign * variables.get(t.image);
     } #Variable
     | "-" Expr3(-1)
-    | "(" Expr1() ")"
+    | "(" Expr1(sign) ")"
 }
